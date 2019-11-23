@@ -39,8 +39,10 @@ public class TransactionHandler {
             respondWith(exchange, balance);
         } catch (BankDao.ClientAlreadyExist ex) {
             exchange.setStatusCode(StatusCodes.CONFLICT);
-        } catch (Exception ex) {
+        } catch (BankDao.ClientNotFound ex) {
             exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+        } catch (Exception ex) {
+            exchange.setStatusCode(StatusCodes.NOT_IMPLEMENTED);
         }
         exchange.endExchange();
     }
