@@ -1,6 +1,6 @@
 package de.revolut.taketwo;
 
-import de.revolut.taketwo.service.TranscationHandler;
+import de.revolut.taketwo.service.TransactionHandler;
 
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
@@ -20,8 +20,8 @@ public class EntryPoint {
 
     private static RoutingHandler setupRoutingHandler() {
         final RoutingHandler rootHandler = new RoutingHandler();
-        rootHandler.put("/client/{email}", TranscationHandler::createUserHandler);
-        rootHandler.get("/balance/{email}", TranscationHandler::createUserHandler);
+        rootHandler.put("/client/{email}", TransactionHandler::createClientHandler);
+        rootHandler.get("/balance/{email}", TransactionHandler::getBalance);
         rootHandler.post("/deposit/{email}/{amount}", null);
         rootHandler.post("/withdraw/{email}/{amount}", null);
         rootHandler.post("/transfer/{sender}/{receiver}/{amount}", null);
@@ -35,5 +35,9 @@ public class EntryPoint {
 
     public void startServer() {
         undertow.start();
+    }
+
+    public void stopServer() {
+        undertow.stop();
     }
 }

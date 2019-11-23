@@ -1,6 +1,7 @@
 package de.revolut.taketwo.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,9 +12,13 @@ import lombok.NonNull;
 public class Balance {
     private BigDecimal amount;
 
+    private Balance() {
+        this(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+    }
+
     public Balance(@NonNull BigDecimal amount) {
         validateNegativeAmount(amount);
-        this.amount = amount;
+        this.amount = amount.setScale(2, RoundingMode.HALF_UP);
     }
 
     private void validateNegativeAmount(@NonNull BigDecimal amount) {

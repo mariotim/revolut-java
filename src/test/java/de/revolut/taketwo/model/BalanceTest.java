@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BalanceTest {
-    public static final BigDecimal HUNDRED_BUX = new BigDecimal("100.00");
+class BalanceTest {
+    private static final BigDecimal HUNDRED_BUX = new BigDecimal("100.00");
     private static final BigDecimal NEGATIVE_AMOUNT = new BigDecimal("-100.00");
     private Balance balance;
 
@@ -21,9 +21,7 @@ public class BalanceTest {
 
     @Test
     void constructor_negativeBalance() {
-        assertThrows(Balance.NegativeAmountException.class, () -> {
-            new Balance(NEGATIVE_AMOUNT);
-        });
+        assertThrows(Balance.NegativeAmountException.class, () -> new Balance(NEGATIVE_AMOUNT));
     }
 
     @Test
@@ -34,9 +32,7 @@ public class BalanceTest {
 
     @Test
     void add_negative() {
-        assertThrows(Balance.NegativeAmountException.class, () -> {
-            balance.addCash(NEGATIVE_AMOUNT);
-        });
+        assertThrows(Balance.NegativeAmountException.class, () -> balance.addCash(NEGATIVE_AMOUNT));
     }
 
     @Test
@@ -48,8 +44,7 @@ public class BalanceTest {
 
     @Test
     void subtract_negative() {
-        assertThrows(Balance.NegativeAmountException.class, () -> {
-            balance.subtract(NEGATIVE_AMOUNT);
-        });
+        assertThrows(Balance.NegativeAmountException.class,
+                     () -> balance.subtract(NEGATIVE_AMOUNT));
     }
 }
