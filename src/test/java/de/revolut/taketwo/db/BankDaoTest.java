@@ -23,19 +23,19 @@ class BankDaoTest {
 
     @Test
     void createClient() {
-        bank.createClient(new Client("email1"));
+        bank.createClient(new Client("bankDaoTest_email1"));
     }
 
     @Test
     void createClient_AlreadyExist() {
-        final Client client = new Client("email2");
+        final Client client = new Client("bankDaoTest_email2");
         bank.createClient(client);
         assertThrows(BankDao.ClientAlreadyExist.class, () -> bank.createClient(client));
     }
 
     @Test
     void balance() {
-        final Client client = new Client("email3");
+        final Client client = new Client("bankDaoTest_email3");
         bank.createClient(client);
         Balance balance = bank.balance(client);
         assertThat(balance).isEqualTo(new Balance(BigDecimal.ZERO));
@@ -49,7 +49,7 @@ class BankDaoTest {
 
     @Test
     void deposit() {
-        final Client client = new Client("email4");
+        final Client client = new Client("bankDaoTest_email4");
         bank.createClient(client);
         Balance balance = bank.deposit(client, HUNDRED_BUX);
         assertThat(balance).isEqualTo(new Balance(HUNDRED_BUX));
@@ -63,7 +63,7 @@ class BankDaoTest {
 
     @Test
     void deposit_negativeAmount() {
-        final Client client = new Client("email5");
+        final Client client = new Client("bankDaoTest_email5");
         bank.createClient(client);
         assertThrows(Balance.NegativeAmountException.class,
                      () -> bank.deposit(client, new BigDecimal("-100.00")));
@@ -71,7 +71,7 @@ class BankDaoTest {
 
     @Test
     void withdraw_insufficientFunds() {
-        final Client client = new Client("email6");
+        final Client client = new Client("bankDaoTest_email6");
         bank.createClient(client);
         assertThrows(Balance.NegativeAmountException.class,
                      () -> bank.withdraw(client, HUNDRED_BUX));
@@ -80,7 +80,7 @@ class BankDaoTest {
 
     @Test
     void withdraw() {
-        final Client client = new Client("email7");
+        final Client client = new Client("bankDaoTest_email7");
         bank.createClient(client);
         bank.deposit(client, HUNDRED_BUX);
         bank.withdraw(client, HUNDRED_BUX);
@@ -98,8 +98,8 @@ class BankDaoTest {
 
     @Test
     void transfer() {
-        final Client sender = new Client("email8");
-        final Client receiver = new Client("email9");
+        final Client sender = new Client("bankDaoTest_email8");
+        final Client receiver = new Client("bankDaoTest_email9");
         bank.createClient(sender);
         bank.createClient(receiver);
         bank.deposit(sender, HUNDRED_BUX);

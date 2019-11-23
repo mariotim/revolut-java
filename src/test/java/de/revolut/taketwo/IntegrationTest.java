@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.revolut.taketwo.model.Balance;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -19,24 +20,25 @@ import jdk.incubator.http.HttpResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IntegrationTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class IntegrationTest {
     private static final String URI_CREATE = "http://localhost:8080/client/";
     private static final String URI_BALANCE = "http://localhost:8080/balance/";
     private static final String URI_DEPOSIT = "http://localhost:8080/deposit/";
     private static final String URI_WITHDRAW = "http://localhost:8080/withdraw/";
     private static final String URI_TRANSFER = "http://localhost:8080/transfer/";
-    private EntryPoint entryPoint;
-    private HttpClient client;
+    private static EntryPoint entryPoint;
+    private static HttpClient client;
 
-    @BeforeEach
-    void init() {
+    @BeforeAll
+    static void init() {
         entryPoint = new EntryPoint();
         entryPoint.startServer();
         client = HttpClient.newHttpClient();
     }
 
-    @AfterEach
-    void tearDown() {
+    @AfterAll
+    static void tearDown() {
         entryPoint.stopServer();
     }
 
@@ -63,7 +65,7 @@ public class IntegrationTest {
         HttpResponse<String> response = getBalanceResponse(email);
         Balance balance = new ObjectMapper().readValue(response.body(), Balance.class);
         assertThat(response.statusCode()).isEqualTo(StatusCodes.OK);
-        assertThat(balance).isEqualTo(new Balance(new BigDecimal("0.00")));
+        assertThat(balance).isEqualTo(new Balance(BigDecimal.ZERO));
     }
 
     @Test
