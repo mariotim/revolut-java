@@ -14,14 +14,14 @@ public class EntryPoint {
         final RoutingHandler rootHandler = setupRoutingHandler();
         undertow = Undertow
                        .builder()
-                       .addHttpListener(8080, "localhost", rootHandler)
+                       .addHttpListener(8080, "0.0.0.0", rootHandler)
                        .build();
     }
 
     private static RoutingHandler setupRoutingHandler() {
         final RoutingHandler rootHandler = new RoutingHandler();
         rootHandler.put("/client/{email}", TranscationHandler::createUserHandler);
-        rootHandler.get("/balance/{email}", null);
+        rootHandler.get("/balance/{email}", TranscationHandler::createUserHandler);
         rootHandler.post("/deposit/{email}/{amount}", null);
         rootHandler.post("/withdraw/{email}/{amount}", null);
         rootHandler.post("/transfer/{sender}/{receiver}/{amount}", null);

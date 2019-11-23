@@ -11,6 +11,7 @@ public class TranscationHandler {
         @NonNull
         final HttpServerExchange exchange) {
         exchange.setStatusCode(StatusCodes.CREATED);
-
+        System.out.println("Received\n\n");
+        exchange.endExchange();
     }
 }
