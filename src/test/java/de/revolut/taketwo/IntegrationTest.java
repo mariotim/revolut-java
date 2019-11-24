@@ -76,10 +76,11 @@ class IntegrationTest {
     @Test
     void deposit() throws IOException, InterruptedException {
         final String email = "email5";
-        verifyDepositHundredBux(email);
+        verifyNewClientWithHundredBux(email);
     }
 
-    private void verifyDepositHundredBux(String email) throws IOException, InterruptedException {
+    private void verifyNewClientWithHundredBux(String email)
+    throws IOException, InterruptedException {
         verifyCreateClient(email);
         HttpResponse<String> depositResponse = deposit(email, HUNDRED_BUX);
         assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.OK);
@@ -104,7 +105,7 @@ class IntegrationTest {
     @Test
     void withdraw() throws IOException, InterruptedException {
         final String email = "email7";
-        verifyDepositHundredBux(email);
+        verifyNewClientWithHundredBux(email);
         HttpResponse<String> withdrawResponse = withdraw(email, HUNDRED_BUX);
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.OK);
         verifyBalance(email, new Balance(BigDecimal.ZERO));
@@ -113,7 +114,7 @@ class IntegrationTest {
     @Test
     void withdraw_insufficientFunds() throws IOException, InterruptedException {
         final String email = "email8";
-        verifyDepositHundredBux(email);
+        verifyNewClientWithHundredBux(email);
         HttpResponse<String> withdrawResponse = withdraw(email, new BigDecimal("10000000.00"));
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
     }
@@ -121,7 +122,7 @@ class IntegrationTest {
     @Test
     void withdraw_negativeAmount() throws IOException, InterruptedException {
         final String email = "email9";
-        verifyDepositHundredBux(email);
+        verifyNewClientWithHundredBux(email);
         HttpResponse<String> withdrawResponse = withdraw(email, new BigDecimal("-10000000.00"));
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
     }
@@ -130,6 +131,63 @@ class IntegrationTest {
     void withdraw_clientNotFound() throws IOException, InterruptedException {
         HttpResponse<String> withdrawResponse = withdraw("notFoundClient", HUNDRED_BUX);
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void transfer() throws IOException, InterruptedException {
+        final String sender = "email10";
+        final String receiver = "email11";
+        verifyCreateClient(receiver);
+        verifyNewClientWithHundredBux(sender);
+        HttpResponse<String> transferResponse = transfer(sender, receiver, HUNDRED_BUX);
+        assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.OK);
+        verifyBalance(sender, new Balance(BigDecimal.ZERO));
+        verifyBalance(receiver, new Balance(HUNDRED_BUX));
+    }
+
+    @Test
+    void transfer_clientNotFound() throws IOException, InterruptedException {
+        HttpResponse<String> transferResponse = transfer("notFoundClient", "notFound", HUNDRED_BUX);
+        assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void transfer_negativeAmount() throws IOException, InterruptedException {
+        final String sender = "email12";
+        final String receiver = "email13";
+        verifyCreateClient(sender);
+        verifyCreateClient(receiver);
+        HttpResponse<String> transferResponse = transfer(sender,
+                                                         receiver,
+                                                         new BigDecimal("-1000.00"));
+        assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void transfer_insufficientFunds() throws IOException, InterruptedException {
+        final String sender = "email14";
+        final String receiver = "email15";
+        verifyCreateClient(sender);
+        verifyCreateClient(receiver);
+        HttpResponse<String> transferResponse = transfer(sender,
+                                                         receiver,
+                                                         new BigDecimal("1000.00"));
+        assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    private HttpResponse<String> transfer(String sender, String receiver, BigDecimal hundredBux)
+    throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder();
+        HttpRequest request = builder
+                                  .uri(URI.create(URI_TRANSFER
+                                                  + sender
+                                                  + "/"
+                                                  + receiver
+                                                  + "/"
+                                                  + hundredBux))
+                                  .POST(HttpRequest.BodyPublisher.noBody())
+                                  .build();
+        return sendRequest(client, request);
     }
 
     private void verifyCreateClient(String email1) throws IOException, InterruptedException {

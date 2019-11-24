@@ -24,7 +24,7 @@ public class EntryPoint {
         rootHandler.get("/balance/{email}", TransactionHandler::getBalance);
         rootHandler.post("/deposit/{email}/{amount}", TransactionHandler::deposit);
         rootHandler.post("/withdraw/{email}/{amount}", TransactionHandler::withdraw);
-        rootHandler.post("/transfer/{sender}/{receiver}/{amount}", null);
+        rootHandler.post("/transfer/{sender}/{receiver}/{amount}", TransactionHandler::transfer);
         rootHandler.setFallbackHandler(HANDLE_404);
         return rootHandler;
     }

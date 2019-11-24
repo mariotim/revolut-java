@@ -93,4 +93,19 @@ public class TransactionHandler {
         }
         exchange.endExchange();
     }
+
+    public static void transfer(HttpServerExchange exchange) {
+        try {
+            Client sender = new Client(extractParam(exchange, "sender"));
+            Client receiver = new Client(extractParam(exchange, "receiver"));
+            String amount = extractParam(exchange, "amount");
+            bank.transfer(sender, receiver, new BigDecimal(amount));
+            exchange.setStatusCode(StatusCodes.OK);
+        } catch (BankDao.ClientNotFound | Balance.NegativeAmountException | Balance.InsufficientFundsException ex) {
+            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+        } catch (Exception ex) {
+            exchange.setStatusCode(StatusCodes.NOT_IMPLEMENTED);
+        }
+        exchange.endExchange();
+    }
 }
