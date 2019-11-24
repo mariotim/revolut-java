@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IntegrationTest {
+    private static final BigDecimal HUNDRED_BUX = new BigDecimal("100.00");
     private static final String URI_CREATE = "http://localhost:8080/client/";
     private static final String URI_BALANCE = "http://localhost:8080/balance/";
     private static final String URI_DEPOSIT = "http://localhost:8080/deposit/";
@@ -62,10 +63,16 @@ class IntegrationTest {
         final String email = "email3";
         HttpResponse<String> createResponse = createClientResponse(email);
         assertThat(createResponse.statusCode()).isEqualTo(StatusCodes.CREATED);
+        final Balance expectedBalance = new Balance(BigDecimal.ZERO);
+        verifyBalance(email, expectedBalance);
+    }
+
+    private void verifyBalance(String email, Balance expectedBalance)
+    throws IOException, InterruptedException {
         HttpResponse<String> response = getBalanceResponse(email);
         Balance balance = new ObjectMapper().readValue(response.body(), Balance.class);
         assertThat(response.statusCode()).isEqualTo(StatusCodes.OK);
-        assertThat(balance).isEqualTo(new Balance(BigDecimal.ZERO));
+        assertThat(balance).isEqualTo(expectedBalance);
     }
 
     @Test
@@ -73,6 +80,88 @@ class IntegrationTest {
         final String email = "email4";
         HttpResponse<String> response = getBalanceResponse(email);
         assertThat(response.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void deposit() throws IOException, InterruptedException {
+        final String email = "email5";
+        verifyDepositHundredBux(email);
+    }
+
+    private void verifyDepositHundredBux(String email) throws IOException, InterruptedException {
+        HttpResponse<String> createResponse = createClientResponse(email);
+        assertThat(createResponse.statusCode()).isEqualTo(StatusCodes.CREATED);
+        HttpResponse<String> depositResponse = deposit(email, HUNDRED_BUX);
+        assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.OK);
+        verifyBalance(email, new Balance(HUNDRED_BUX));
+    }
+
+    @Test
+    void deposit_negativeAmount() throws IOException, InterruptedException {
+        final String email = "email6";
+        HttpResponse<String> createResponse = createClientResponse(email);
+        assertThat(createResponse.statusCode()).isEqualTo(StatusCodes.CREATED);
+        HttpResponse<String> depositResponse = deposit(email, new BigDecimal("-100.00"));
+        assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void deposit_ClientNotFound() throws IOException, InterruptedException {
+        final String email = "nonExistingMail";
+        HttpResponse<String> depositResponse = deposit(email, HUNDRED_BUX);
+        assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void withdraw() throws IOException, InterruptedException {
+        final String email = "email7";
+        verifyDepositHundredBux(email);
+        HttpResponse<String> withdrawResponse = withdraw(email, HUNDRED_BUX);
+        assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.OK);
+        verifyBalance(email, new Balance(BigDecimal.ZERO));
+    }
+
+    @Test
+    void withdraw_insufficientFunds() throws IOException, InterruptedException {
+        final String email = "email8";
+        verifyDepositHundredBux(email);
+        HttpResponse<String> withdrawResponse = withdraw(email, new BigDecimal("10000000.00"));
+        assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void withdraw_negativeAmount() throws IOException, InterruptedException {
+        final String email = "email9";
+        verifyDepositHundredBux(email);
+        HttpResponse<String> withdrawResponse = withdraw(email, new BigDecimal("-10000000.00"));
+        assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    @Test
+    void withdraw_clientNotFound() throws IOException, InterruptedException {
+        HttpResponse<String> withdrawResponse = withdraw("notFoundClient", HUNDRED_BUX);
+        assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    private HttpResponse<String> withdraw(String email, BigDecimal amount)
+    throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder();
+        HttpRequest request = builder
+                                  .uri(URI.create(URI_WITHDRAW + email + "/" + amount))
+                                  .POST(HttpRequest.BodyPublisher.noBody())
+                                  .build();
+        return sendRequest(client, request);
+    }
+
+
+    private HttpResponse<String> deposit(String email, BigDecimal amount)
+    throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder();
+        HttpRequest request = builder
+                                  .uri(URI.create(URI_DEPOSIT + email + "/" + amount))
+                                  .POST(HttpRequest.BodyPublisher.noBody())
+                                  .build();
+        return sendRequest(client, request);
     }
 
     private HttpResponse<String> getBalanceResponse(String email)

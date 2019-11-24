@@ -7,6 +7,7 @@ import de.revolut.taketwo.db.BankDao;
 import de.revolut.taketwo.model.Balance;
 import de.revolut.taketwo.model.Client;
 
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 
 import io.undertow.server.HttpServerExchange;
@@ -62,5 +63,34 @@ public class TransactionHandler {
                    .getQueryParameters()
                    .get(email)
                    .getFirst();
+    }
+
+    public static void deposit(HttpServerExchange exchange) {
+        try {
+            String email = extractParam(exchange, "email");
+            String amount = extractParam(exchange, "amount");
+            Balance balance = bank.deposit(new Client(email), new BigDecimal(amount));
+            exchange.setStatusCode(StatusCodes.OK);
+            respondWith(exchange, balance);
+        } catch (BankDao.ClientNotFound | Balance.NegativeAmountException ex) {
+            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+        } catch (Exception ex) {
+            exchange.setStatusCode(StatusCodes.NOT_IMPLEMENTED);
+        }
+        exchange.endExchange();
+    }
+
+    public static void withdraw(HttpServerExchange exchange) {
+        try {
+            String email = extractParam(exchange, "email");
+            String amount = extractParam(exchange, "amount");
+            bank.withdraw(new Client(email), new BigDecimal(amount));
+            exchange.setStatusCode(StatusCodes.OK);
+        } catch (BankDao.ClientNotFound | Balance.NegativeAmountException | Balance.InsufficientFundsException ex) {
+            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+        } catch (Exception ex) {
+            exchange.setStatusCode(StatusCodes.NOT_IMPLEMENTED);
+        }
+        exchange.endExchange();
     }
 }

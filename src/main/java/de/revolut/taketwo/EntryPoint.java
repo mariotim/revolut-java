@@ -22,8 +22,8 @@ public class EntryPoint {
         final RoutingHandler rootHandler = new RoutingHandler();
         rootHandler.put("/client/{email}", TransactionHandler::createClientHandler);
         rootHandler.get("/balance/{email}", TransactionHandler::getBalance);
-        rootHandler.post("/deposit/{email}/{amount}", null);
-        rootHandler.post("/withdraw/{email}/{amount}", null);
+        rootHandler.post("/deposit/{email}/{amount}", TransactionHandler::deposit);
+        rootHandler.post("/withdraw/{email}/{amount}", TransactionHandler::withdraw);
         rootHandler.post("/transfer/{sender}/{receiver}/{amount}", null);
         rootHandler.setFallbackHandler(HANDLE_404);
         return rootHandler;
