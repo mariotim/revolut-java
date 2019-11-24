@@ -50,10 +50,6 @@ class IntegrationTest {
         verifyCreateClient(email1);
     }
 
-    private void verifyCreateClient(String email1) throws IOException, InterruptedException {
-        HttpResponse<String> response = createClientResponse(email1);
-        assertThat(response.statusCode()).isEqualTo(StatusCodes.CREATED);
-    }
 
     @Test
     void createClient_Exist() throws IOException, InterruptedException {
@@ -68,14 +64,6 @@ class IntegrationTest {
         verifyCreateClient(email);
         final Balance expectedBalance = new Balance(BigDecimal.ZERO);
         verifyBalance(email, expectedBalance);
-    }
-
-    private void verifyBalance(String email, Balance expectedBalance)
-    throws IOException, InterruptedException {
-        HttpResponse<String> response = getBalanceResponse(email);
-        Balance balance = new ObjectMapper().readValue(response.body(), Balance.class);
-        assertThat(response.statusCode()).isEqualTo(StatusCodes.OK);
-        assertThat(balance).isEqualTo(expectedBalance);
     }
 
     @Test
@@ -142,6 +130,19 @@ class IntegrationTest {
     void withdraw_clientNotFound() throws IOException, InterruptedException {
         HttpResponse<String> withdrawResponse = withdraw("notFoundClient", HUNDRED_BUX);
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+    }
+
+    private void verifyCreateClient(String email1) throws IOException, InterruptedException {
+        HttpResponse<String> response = createClientResponse(email1);
+        assertThat(response.statusCode()).isEqualTo(StatusCodes.CREATED);
+    }
+
+    private void verifyBalance(String email, Balance expectedBalance)
+    throws IOException, InterruptedException {
+        HttpResponse<String> response = getBalanceResponse(email);
+        Balance balance = new ObjectMapper().readValue(response.body(), Balance.class);
+        assertThat(response.statusCode()).isEqualTo(StatusCodes.OK);
+        assertThat(balance).isEqualTo(expectedBalance);
     }
 
     private HttpResponse<String> withdraw(String email, BigDecimal amount)
