@@ -36,7 +36,7 @@ public class Balance {
     public Balance subtract(BigDecimal amount) {
         validateNegativeAmount(amount);
         if (this.amount.compareTo(amount) < 0) {
-            throw new NegativeAmountException("Insufficient funds");
+            throw new InsufficientFundsException("Insufficient funds");
         }
         this.amount = this.amount.subtract(amount);
         return this;
@@ -44,6 +44,12 @@ public class Balance {
 
     public class NegativeAmountException extends IllegalArgumentException {
         NegativeAmountException(String message) {
+            super(message);
+        }
+    }
+
+    public class InsufficientFundsException extends IllegalStateException {
+        InsufficientFundsException(String message) {
             super(message);
         }
     }

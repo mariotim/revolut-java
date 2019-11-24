@@ -47,4 +47,10 @@ class BalanceTest {
         assertThrows(Balance.NegativeAmountException.class,
                      () -> balance.subtract(NEGATIVE_AMOUNT));
     }
+
+    @Test
+    void insufficientFunds() {
+        assertThrows(Balance.InsufficientFundsException.class,
+                     () -> balance.subtract(new BigDecimal("100000.00")));
+    }
 }

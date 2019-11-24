@@ -73,7 +73,7 @@ class BankDaoTest {
     void withdraw_insufficientFunds() {
         final Client client = new Client("bankDaoTest_email6");
         bank.createClient(client);
-        assertThrows(Balance.NegativeAmountException.class,
+        assertThrows(Balance.InsufficientFundsException.class,
                      () -> bank.withdraw(client, HUNDRED_BUX));
 
     }
