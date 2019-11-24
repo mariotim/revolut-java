@@ -46,14 +46,18 @@ class IntegrationTest {
 
     @Test
     void createClient() throws IOException, InterruptedException {
-        HttpResponse<String> response = createClientResponse("email1");
+        final String email1 = "email1";
+        verifyCreateClient(email1);
+    }
+
+    private void verifyCreateClient(String email1) throws IOException, InterruptedException {
+        HttpResponse<String> response = createClientResponse(email1);
         assertThat(response.statusCode()).isEqualTo(StatusCodes.CREATED);
     }
 
     @Test
     void createClient_Exist() throws IOException, InterruptedException {
-        HttpResponse<String> response = createClientResponse("email2");
-        assertThat(response.statusCode()).isEqualTo(StatusCodes.CREATED);
+        verifyCreateClient("email2");
         HttpResponse<String> duplicateMail = createClientResponse("email2");
         assertThat(duplicateMail.statusCode()).isEqualTo(StatusCodes.CONFLICT);
     }
@@ -61,8 +65,7 @@ class IntegrationTest {
     @Test
     void balance() throws IOException, InterruptedException {
         final String email = "email3";
-        HttpResponse<String> createResponse = createClientResponse(email);
-        assertThat(createResponse.statusCode()).isEqualTo(StatusCodes.CREATED);
+        verifyCreateClient(email);
         final Balance expectedBalance = new Balance(BigDecimal.ZERO);
         verifyBalance(email, expectedBalance);
     }
@@ -89,8 +92,7 @@ class IntegrationTest {
     }
 
     private void verifyDepositHundredBux(String email) throws IOException, InterruptedException {
-        HttpResponse<String> createResponse = createClientResponse(email);
-        assertThat(createResponse.statusCode()).isEqualTo(StatusCodes.CREATED);
+        verifyCreateClient(email);
         HttpResponse<String> depositResponse = deposit(email, HUNDRED_BUX);
         assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.OK);
         verifyBalance(email, new Balance(HUNDRED_BUX));
@@ -99,8 +101,7 @@ class IntegrationTest {
     @Test
     void deposit_negativeAmount() throws IOException, InterruptedException {
         final String email = "email6";
-        HttpResponse<String> createResponse = createClientResponse(email);
-        assertThat(createResponse.statusCode()).isEqualTo(StatusCodes.CREATED);
+        verifyCreateClient(email);
         HttpResponse<String> depositResponse = deposit(email, new BigDecimal("-100.00"));
         assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
     }
