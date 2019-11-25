@@ -15,7 +15,11 @@ import jdk.incubator.http.HttpClient;
 import jdk.incubator.http.HttpRequest;
 import jdk.incubator.http.HttpResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class HttpRequestHelper {
+    protected static final BigDecimal HUNDRED_BUX = new BigDecimal("100.00");
+
     private static final String URI_CREATE = "http://localhost:8080/client/";
     private static final String URI_BALANCE = "http://localhost:8080/balance/";
     private static final String URI_DEPOSIT = "http://localhost:8080/deposit/";
@@ -89,7 +93,7 @@ public class HttpRequestHelper {
         return sendRequest(client, request);
     }
 
-    HttpResponse<String> sendRequest(HttpClient client, HttpRequest request)
+    private HttpResponse<String> sendRequest(HttpClient client, HttpRequest request)
     throws IOException, InterruptedException {
         return client.send(request, HttpResponse.BodyHandler.asString());
     }
@@ -103,5 +107,13 @@ public class HttpRequestHelper {
                                   .build();
 
         return sendRequest(client, request);
+    }
+
+
+    void verifyNewClientWithHundredBux(String email) throws IOException, InterruptedException {
+        verifyCreateClient(email);
+        HttpResponse<String> depositResponse = deposit(email, HUNDRED_BUX);
+        assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.OK);
+        verifyBalance(email, new Balance(HUNDRED_BUX));
     }
 }

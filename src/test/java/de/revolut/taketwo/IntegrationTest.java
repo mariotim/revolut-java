@@ -68,16 +68,9 @@ class IntegrationTest {
     @Test
     void deposit() throws IOException, InterruptedException {
         final String email = "email5";
-        verifyNewClientWithHundredBux(email);
+        httpRequestHelper.verifyNewClientWithHundredBux(email);
     }
 
-    private void verifyNewClientWithHundredBux(String email)
-    throws IOException, InterruptedException {
-        httpRequestHelper.verifyCreateClient(email);
-        HttpResponse<String> depositResponse = httpRequestHelper.deposit(email, HUNDRED_BUX);
-        assertThat(depositResponse.statusCode()).isEqualTo(StatusCodes.OK);
-        httpRequestHelper.verifyBalance(email, new Balance(HUNDRED_BUX));
-    }
 
     @Test
     void deposit_negativeAmount() throws IOException, InterruptedException {
@@ -97,7 +90,7 @@ class IntegrationTest {
     @Test
     void withdraw() throws IOException, InterruptedException {
         final String email = "email7";
-        verifyNewClientWithHundredBux(email);
+        httpRequestHelper.verifyNewClientWithHundredBux(email);
         HttpResponse<String> withdrawResponse = httpRequestHelper.withdraw(email, HUNDRED_BUX);
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.OK);
         httpRequestHelper.verifyBalance(email, new Balance(BigDecimal.ZERO));
@@ -106,7 +99,7 @@ class IntegrationTest {
     @Test
     void withdraw_insufficientFunds() throws IOException, InterruptedException {
         final String email = "email8";
-        verifyNewClientWithHundredBux(email);
+        httpRequestHelper.verifyNewClientWithHundredBux(email);
         HttpResponse<String> withdrawResponse = httpRequestHelper.withdraw(email,
                                                                            new BigDecimal("10000000.00"));
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
@@ -115,7 +108,7 @@ class IntegrationTest {
     @Test
     void withdraw_negativeAmount() throws IOException, InterruptedException {
         final String email = "email9";
-        verifyNewClientWithHundredBux(email);
+        httpRequestHelper.verifyNewClientWithHundredBux(email);
         HttpResponse<String> withdrawResponse = httpRequestHelper.withdraw(email,
                                                                            new BigDecimal("-10000000.00"));
         assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
@@ -132,7 +125,7 @@ class IntegrationTest {
         final String sender = "email10";
         final String receiver = "email11";
         httpRequestHelper.verifyCreateClient(receiver);
-        verifyNewClientWithHundredBux(sender);
+        httpRequestHelper.verifyNewClientWithHundredBux(sender);
         HttpResponse<String> transferResponse = httpRequestHelper.transfer(sender, receiver, HUNDRED_BUX);
         assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.OK);
         httpRequestHelper.verifyBalance(sender, new Balance(BigDecimal.ZERO));
@@ -170,46 +163,4 @@ class IntegrationTest {
                                                                            new BigDecimal("1000.00"));
         assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
     }
-
-
-    /*private HttpResponse<String> transfer(String sender, String receiver, BigDecimal hundredBux)
-    throws IOException, InterruptedException {
-        return httpRequestHelper.transfer(sender, receiver, hundredBux);
-    }
-
-    private void verifyCreateClient(String email1) throws IOException, InterruptedException {
-        httpRequestHelper.verifyCreateClient(email1);
-    }
-
-    private void verifyBalance(String email, Balance expectedBalance)
-    throws IOException, InterruptedException {
-        httpRequestHelper.verifyBalance(email, expectedBalance);
-    }
-
-    private HttpResponse<String> withdraw(String email, BigDecimal amount)
-    throws IOException, InterruptedException {
-        return httpRequestHelper.withdraw(email, amount);
-    }
-
-
-    private HttpResponse<String> deposit(String email, BigDecimal amount)
-    throws IOException, InterruptedException {
-        return httpRequestHelper.deposit(email, amount);
-    }
-
-    private HttpResponse<String> getBalanceResponse(String email)
-    throws IOException, InterruptedException {
-        return httpRequestHelper.getBalanceResponse(email);
-    }
-
-    private HttpResponse<String> sendRequest(HttpClient client, HttpRequest request)
-    throws IOException, InterruptedException {
-        return httpRequestHelper.sendRequest(client, request);
-    }
-
-    private HttpResponse<String> createClientResponse(String email)
-    throws IOException, InterruptedException {
-
-        return httpRequestHelper.createClientResponse(email);
-    }*/
 }
