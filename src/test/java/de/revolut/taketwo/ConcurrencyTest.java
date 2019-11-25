@@ -41,7 +41,7 @@ public class ConcurrencyTest {
     }
 
     @Test(dependsOnMethods = {"multipleRequestsToWithdrawFromOneBankAccount"})
-    void verifyBalance() throws IOException, InterruptedException {
+    void verifyDataIntegrity() throws IOException, InterruptedException {
         BigDecimal expectedBalanceAfterAll = new BigDecimal("90.00");
         httpRequestHelper.verifyBalance(EMAIL, new Balance(expectedBalanceAfterAll));
     }
