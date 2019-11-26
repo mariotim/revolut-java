@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode
-public class Client {
-    private String email;
+public final class Client {
+    private final String email;
 
     public Client(String email) {
         this.email = email;

@@ -16,8 +16,8 @@ import jdk.incubator.http.HttpResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConcurrencyTest {
-    private static final int POOL_SIZE = 5;
-    private static final int INVOCATION_COUNT = 1000;
+    private static final int POOL_SIZE = 2;
+    private static final int INVOCATION_COUNT = 100;
     private final String EMAIL = "emailToTestConcurrency";
     private HttpRequestHelper httpRequestHelper;
     private EntryPoint entryPoint;
@@ -42,7 +42,7 @@ public class ConcurrencyTest {
 
     @Test(dependsOnMethods = {"multipleRequestsToWithdrawFromOneBankAccount"})
     void verifyDataIntegrity() throws IOException, InterruptedException {
-        BigDecimal expectedBalanceAfterAll = new BigDecimal("90.00");
+        BigDecimal expectedBalanceAfterAll = new BigDecimal("99.00");
         httpRequestHelper.verifyBalance(EMAIL, new Balance(expectedBalanceAfterAll));
     }
 

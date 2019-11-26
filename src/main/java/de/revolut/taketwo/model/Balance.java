@@ -9,8 +9,8 @@ import lombok.NonNull;
 
 @EqualsAndHashCode
 @Data
-public class Balance {
-    private BigDecimal amount;
+public final class Balance {
+    private final BigDecimal amount;
 
     private Balance() {
         this(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
@@ -29,8 +29,7 @@ public class Balance {
 
     public Balance addCash(BigDecimal incomingCash) {
         validateNegativeAmount(incomingCash);
-        this.amount = this.amount.add(incomingCash);
-        return this;
+        return new Balance(this.amount.add(incomingCash));
     }
 
     public Balance subtract(BigDecimal amount) {
@@ -38,8 +37,7 @@ public class Balance {
         if (this.amount.compareTo(amount) < 0) {
             throw new InsufficientFundsException("Insufficient funds");
         }
-        this.amount = this.amount.subtract(amount);
-        return this;
+        return new Balance(this.amount.subtract(amount));
     }
 
     public class NegativeAmountException extends IllegalArgumentException {
