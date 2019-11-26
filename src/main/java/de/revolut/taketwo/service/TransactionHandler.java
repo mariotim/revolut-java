@@ -86,8 +86,10 @@ public class TransactionHandler {
             String amount = extractParam(exchange, "amount");
             bank.withdraw(new Client(email), new BigDecimal(amount));
             exchange.setStatusCode(StatusCodes.OK);
-        } catch (BankDao.ClientNotFound | Balance.NegativeAmountException | Balance.InsufficientFundsException ex) {
+        } catch (BankDao.ClientNotFound | Balance.NegativeAmountException ex) {
             exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+        } catch (Balance.InsufficientFundsException ex) {
+            exchange.setStatusCode(StatusCodes.FORBIDDEN);
         } catch (Exception ex) {
             exchange.setStatusCode(StatusCodes.NOT_IMPLEMENTED);
         }
@@ -101,8 +103,10 @@ public class TransactionHandler {
             String amount = extractParam(exchange, "amount");
             bank.transfer(sender, receiver, new BigDecimal(amount));
             exchange.setStatusCode(StatusCodes.OK);
-        } catch (BankDao.ClientNotFound | Balance.NegativeAmountException | Balance.InsufficientFundsException ex) {
+        } catch (BankDao.ClientNotFound | Balance.NegativeAmountException ex) {
             exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+        } catch (Balance.InsufficientFundsException ex) {
+            exchange.setStatusCode(StatusCodes.FORBIDDEN);
         } catch (Exception ex) {
             exchange.setStatusCode(StatusCodes.NOT_IMPLEMENTED);
         }

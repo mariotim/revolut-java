@@ -102,7 +102,7 @@ class IntegrationTest {
         httpRequestHelper.verifyNewClientWithHundredBux(email);
         HttpResponse<String> withdrawResponse = httpRequestHelper.withdraw(email,
                                                                            new BigDecimal("10000000.00"));
-        assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+        assertThat(withdrawResponse.statusCode()).isEqualTo(StatusCodes.FORBIDDEN);
     }
 
     @Test
@@ -161,6 +161,6 @@ class IntegrationTest {
         HttpResponse<String> transferResponse = httpRequestHelper.transfer(sender,
                                                                            receiver,
                                                                            new BigDecimal("1000.00"));
-        assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.BAD_REQUEST);
+        assertThat(transferResponse.statusCode()).isEqualTo(StatusCodes.FORBIDDEN);
     }
 }
