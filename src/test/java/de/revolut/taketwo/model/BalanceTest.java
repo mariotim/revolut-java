@@ -37,9 +37,9 @@ class BalanceTest {
 
     @Test
     void subtract() {
-        balance.addCash(HUNDRED_BUX);
-        Balance newBalance = balance.subtract(HUNDRED_BUX);
-        assertThat(newBalance).isEqualTo(new Balance(new BigDecimal("0.00")));
+        Balance balanceWithHundredBux = balance.addCash(HUNDRED_BUX);
+        Balance balanceAfterWithdrawal = balanceWithHundredBux.subtract(HUNDRED_BUX);
+        assertThat(balanceAfterWithdrawal).isEqualTo(new Balance(new BigDecimal("0.00")));
     }
 
     @Test
