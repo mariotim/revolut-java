@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class BankDao implements Bank {
-    private static final BankDao INSTANCE = new BankDao();
+
     private final ConcurrentMap<Client, Balance> bankRevolut;
 
     private BankDao() {
@@ -16,7 +16,7 @@ public class BankDao implements Bank {
     }
 
     public static BankDao getInstance() {
-        return INSTANCE;
+        return BillPughSingleton.INSTANCE;
     }
 
     @Override
@@ -58,6 +58,10 @@ public class BankDao implements Bank {
         balance(receiver);
         withdraw(sender, amount);
         deposit(receiver, amount);
+    }
+
+    private static class BillPughSingleton {
+        private static final BankDao INSTANCE = new BankDao();
     }
 
     public class ClientAlreadyExist extends IllegalArgumentException {}
